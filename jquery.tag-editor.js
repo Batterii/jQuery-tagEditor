@@ -183,6 +183,11 @@
                             ed.trigger('click', [$('.active', ed).find('input').closest('li').next('li').find('.tag-editor-tag')]);
                         }, 20); };
                         input.autocomplete(aco);
+
+                        // Start a search w/ autocomplete if specified
+                        if (o.focusOnInit) {
+                            input.autocomplete('search', '');
+                        }
                     }
                 }
                 return false;
@@ -344,6 +349,11 @@
                 distance: 5, cancel: '.tag-editor-spacer, input', helper: 'clone',
                 update: function(){ update_globals(); }
             });
+
+            // Give focus to autocomplete if specified
+            if (o.focusOnInit) {
+                ed.trigger('click');
+            }
         });
     };
 
@@ -357,6 +367,7 @@
         removeDuplicates: true,
         clickDelete: false,
         animateDelete: 175,
+        focusOnInit: false,
         sortable: true, // jQuery UI sortable
         autocomplete: null, // options dict for jQuery UI autocomplete
 
