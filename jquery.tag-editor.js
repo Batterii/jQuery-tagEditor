@@ -174,6 +174,11 @@
                             ed.trigger('click', [$('.active', ed).find('input').closest('li').next('li').find('.tag-editor-tag')]);
                         }, 20); };
                         input.autocomplete(aco);
+
+                        // Start a search w/ autocomplete if specified
+                        if (o.focusOnInit) {
+                            input.autocomplete('search', '');
+                        }
                     }
                 }
                 return false;
