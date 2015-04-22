@@ -110,11 +110,11 @@
 
                 // always remove placeholder on click
                 $('.placeholder', ed).remove();
-                if (closest_tag && closest_tag.length) {
-                    loc = 'before';
-                } else if (o.appendNewTags) {
+                if (o.appendNewTags) {
                     closest_tag = $('.tag-editor-tag', ed).last();
                     loc = closest_tag.length ? 'after' : undefined;
+                } else if (closest_tag && closest_tag.length) {
+                    loc = 'before';
                 } else {
                     // calculate tag closest to click position
                     $('.tag-editor-tag', ed).each(function(){
