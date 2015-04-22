@@ -110,9 +110,12 @@
 
                 // always remove placeholder on click
                 $('.placeholder', ed).remove();
-                if (closest_tag && closest_tag.length)
+                if (closest_tag && closest_tag.length) {
                     loc = 'before';
-                else {
+                } else if (o.appendNewTags) {
+                    loc = 'after';
+                    closest_tag = $('.tag-editor-tag', ed).last();
+                } else {
                     // calculate tag closest to click position
                     $('.tag-editor-tag', ed).each(function(){
                         var tag = $(this), to = tag.offset(), tag_x = to.left, tag_y = to.top;
@@ -340,6 +343,7 @@
         forceLowercase: true,
         clickDelete: false,
         focusOnInit: false,
+        appendNewTags: false,
         sortable: true, // jQuery UI sortable
         autocomplete: null, // options dict for jQuery UI autocomplete
 
