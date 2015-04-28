@@ -188,23 +188,32 @@
             });
 
             // helper: split into multiple tags, e.g. after paste
-            function split_cleanup(input){
+            function split_cleanup(input, editNewTag){
                 var li = input.closest('li'), sub_tags = input.val().replace(/ +/, ' ').split(o.dregex), old_tag = input.data('old_tag');
                 var old_tags = tag_list.slice(0); // copy tag_list
-                for (i=0; i<sub_tags.length; i++) {
+                var saveTags = !(editNewTag && sub_tags.length === 1);
+                for (var i=0; i<sub_tags.length; i++) {
                     tag = $.trim(sub_tags[i]).slice(0, o.maxLength);
                     if (tag) {
                         if (o.forceLowercase) tag = tag.toLowerCase();
-                        tag = o.beforeTagSave(el, ed, old_tags, old_tag, tag) || tag;
-                        // remove duplicates
-                        if (~$.inArray(tag, old_tags))
-                            $('.tag-editor-tag', ed).each(function(){ if ($(this).html() == tag) $(this).closest('li').remove(); });
-                        old_tags.push(tag);
-                        li.before('<li><div class="tag-editor-spacer">&nbsp;'+o.delimiter[0]+'</div><div class="tag-editor-tag">'+tag+'</div><div class="tag-editor-delete"><i></i></div></li>');
-                        o.afterTagSave(el, ed, old_tags, old_tag, tag);
+                        if (saveTags) {
+                            tag = o.beforeTagSave(el, ed, old_tags, old_tag, tag) || tag;
+                            // remove duplicates
+                            if (~$.inArray(tag, old_tags))
+                                $('.tag-editor-tag', ed).each(function(){ if ($(this).html() == tag) $(this).closest('li').remove(); });
+                            old_tags.push(tag);
+                            li.before('<li><div class="tag-editor-spacer">&nbsp;'+o.delimiter[0]+'</div><div class="tag-editor-tag">'+tag+'</div><div class="tag-editor-delete"><i></i></div></li>');
+                            o.afterTagSave(el, ed, old_tags, old_tag, tag);
+                        }
                     }
                 }
-                input.attr('maxlength', o.maxLength).removeData('old_tag').val('').focus();
+
+                input.attr('maxlength', o.maxLength);
+                if (saveTags) {
+                    input.removeData('old_tag').val('');
+                }
+                input.focus();
+
                 update_globals();
             }
 
@@ -237,7 +246,7 @@
             ed.on('paste', 'input', function(e){
                 $(this).removeAttr('maxlength');
                 pasted_content = $(this);
-                setTimeout(function(){ split_cleanup(pasted_content); }, 30);
+                setTimeout(function(){ split_cleanup(pasted_content, true); }, 30);
             });
 
             // keypress delimiter
