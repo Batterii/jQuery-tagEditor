@@ -218,9 +218,12 @@
             }
 
             ed.on('blur', 'input', function(e){
-                var input = $(this), old_tag = input.data('old_tag'), tag = $.trim(input.val().replace(/ +/, ' ').replace(o.dregex, o.delimiter[0]));
+                var input = $(this), old_tag = input.data('old_tag'), tag = $.trim(input.val().replace(/ +/, ' ').replace(o.dregex, o.delimiter[0])), deleteReturnVal;
                 if (!tag) {
-                    if (old_tag && o.beforeTagDelete(el, ed, tag_list, old_tag) === false) {
+                    deleteReturnVal = o.beforeTagDelete(el, ed, tag_list, old_tag);
+                    o.afterTagDelete(el, ed, tag_list, old_tag);
+
+                    if (old_tag && deleteReturnVal === false) {
                         input.val(old_tag).focus();
                         blur_result = false;
                         update_globals();
