@@ -18,7 +18,7 @@
         }
 
         // build options dictionary with default values
-        var blur_result, o = $.extend({}, $.fn.tagEditor.defaults, options), selector = this;
+        var blur_result, o = $.extend({}, $.fn.tagEditor.defaults, options), selector = this, escapePressed = false;
 
         // store regex and default delimiter in options for later use
         o.dregex = new RegExp('['+o.delimiter.replace('-', '\-')+']', 'g');
@@ -257,6 +257,11 @@
                 input.parent().html(escape(tag)).removeClass('active');
                 if (tag != old_tag) update_globals();
                 set_placeholder();
+
+                if (escapePressed) {
+                    o.onEscapeBlur();
+                    escapePressed = false;
+                }
             });
 
             var pasted_content;
@@ -333,6 +338,7 @@
                 else if (e.which == 35 && $t.caret() == $t.val().length) ed.find('.tag-editor-tag').last().click();
                 // esc
                 else if (e.which == 27) {
+                    escapePressed = true;
                     $t.val($t.data('old_tag') ? $t.data('old_tag') : '').blur();
                     return false;
                 }
@@ -381,6 +387,7 @@
 
         // callbacks
         onChange: function(){},
+        onEscapeBlur: function(){},
         beforeTagSave: function(){},
         beforeTagDelete: function(){},
         afterTagSave: function(){},
