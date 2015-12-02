@@ -197,10 +197,11 @@
             });
 
             // helper: split into multiple tags, e.g. after paste
-            function split_cleanup(input){
+            function split_cleanup(input, leaveTrailingAsInput){
                 var li = input.closest('li'), sub_tags = input.val().replace(/ +/, ' ').split(o.dregex),
                     old_tag = input.data('old_tag'), old_tags = tag_list.slice(0), exceeded = false, cb_val; // copy tag_list
-                for (var i=0; i<sub_tags.length; i++) {
+                var new_tags_length = sub_tags.length-(leaveTrailingAsInput ? 1 : 0);
+                for (var i=0; i<new_tags_length; i++) {
                     tag = $.trim(sub_tags[i]).slice(0, o.maxLength);
                     if (o.forceLowercase) tag = tag.toLowerCase();
                     cb_val = o.beforeTagSave(el, ed, old_tags, old_tag, tag);
@@ -214,7 +215,16 @@
                     o.afterTagSave(el, ed, old_tags, old_tag, tag);
                     if (o.maxTags && old_tags.length >= o.maxTags) { exceeded = true; break; }
                 }
-                input.attr('maxlength', o.maxLength).removeData('old_tag').val('')
+                input.attr('maxlength', o.maxLength);
+                // If at least one new tag was created, kill the "old_tag" data.
+                if(new_tags_length > 0) { input.removeData('old_tag'); }
+                // If we want to leave the trailing tag as input, set it's value (so long as we haven't hit the limit)
+                if(leaveTrailingAsInput && !exceeded) {
+                  input.val(sub_tags[sub_tags.length-1]);
+                } else {
+                  input.val('');
+                }
+
                 if (exceeded) input.blur(); else input.focus();
                 update_globals();
             }
@@ -268,7 +278,7 @@
             ed.on('paste', 'input', function(e){
                 $(this).removeAttr('maxlength');
                 pasted_content = $(this);
-                setTimeout(function(){ split_cleanup(pasted_content); }, 30);
+                setTimeout(function(){ split_cleanup(pasted_content, true); }, 30);
             });
 
             // keypress delimiter
@@ -276,7 +286,7 @@
             ed.on('keypress', 'input', function(e){
                 if (o.delimiter.indexOf(String.fromCharCode(e.which))>=0) {
                     inp = $(this);
-                    setTimeout(function(){ split_cleanup(inp); }, 20);
+                    setTimeout(function(){ split_cleanup(inp, true); }, 20);
                 }
             });
 
